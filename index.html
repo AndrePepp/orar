@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ro" data-skin="bilet" data-layout="strip">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Orar 1104A</title>
+  <meta name="description" content="Orarul grupei 1104A, AIA anul I, semestrul I 2026-2027.">
+  <meta name="theme-color" content="#eeece5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f0f0e" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Orar">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script>
+    // aplică tema salvată înainte de desenare (fără „flash”)
+    try {
+      var t = new URLSearchParams(location.search).get('theme') || JSON.parse(localStorage.getItem('orar.theme') || '"v2"');
+      var m = { v2: ['bilet', 'strip'], v4: ['marker', 'tabs'], mix: ['bilet', 'tabs'] }[t] || ['bilet', 'strip'];
+      document.documentElement.dataset.skin = m[0];
+      document.documentElement.dataset.layout = m[1];
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/bilet.css">
+  <link rel="stylesheet" href="css/marker.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="scrim" class="scrim" hidden></div>
+  <section id="sheet" class="sheet" role="dialog" aria-modal="true" aria-label="Setări" hidden>
+    <div class="grab"></div>
+    <div id="sheetBody"></div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
