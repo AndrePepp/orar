@@ -1,7 +1,7 @@
 // Service worker: funcționare offline + afișarea notificărilor push.
-const VERSION = 'orar-1104a-v5';
-const ASSETS = ['./', 'index.html', 'css/common.css', 'css/bilet.css', 'css/marker.css', 'app.js', 'schedule.js', 'manifest.webmanifest',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const VERSION = 'orar-1104a-v5b';
+const ASSETS = ['./', 'index.html', 'app.css', 'app.js', 'schedule.js', 'manifest.webmanifest',
+  'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -33,8 +33,8 @@ self.addEventListener('push', (e) => {
   e.waitUntil(self.registration.showNotification(data.title || 'Orar 1104A', {
     body: data.body || '',
     tag: data.tag,
-    icon: 'icons/icon-192.png',
-    badge: 'icons/icon-192.png',
+    icon: 'icon-192.png',
+    badge: 'icon-192.png',
     silent: false,
     renotify: !!data.tag,
     data: { url: data.url || './' },

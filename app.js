@@ -464,7 +464,7 @@ async function copyCode() {
   refreshSettings();
 }
 async function testLocal() {
-  try { await swReg.showNotification('PC1 laborator în 15 min · sala A1-13', { body: 'Programarea calculatoarelor I, 14:00–17:00', icon: 'icons/icon-192.png', tag: 'test' }); }
+  try { await swReg.showNotification('PC1 laborator în 15 min · sala A1-13', { body: 'Programarea calculatoarelor I, 14:00–17:00', icon: 'icon-192.png', tag: 'test' }); }
   catch (e) { toast(e.message); }
 }
 async function updateBell() {

@@ -1,0 +1,538 @@
+/* comun tuturor temelor: previzualizările din alegerea temei */
+[hidden] { display: none !important; }
+.sw { display: block; height: 58px; border-radius: 8px; border: 1px solid rgba(128,128,128,.25); }
+.sw-v2 {
+  background:
+    linear-gradient(#c6f135, #c6f135) 7px 7px / calc(100% - 14px) 22px no-repeat,
+    linear-gradient(#3a3935, #3a3935) 7px 35px / 70% 5px no-repeat,
+    linear-gradient(#3a3935, #3a3935) 7px 45px / 50% 5px no-repeat,
+    #0f0f0e;
+}
+.sw-v4 {
+  background:
+    linear-gradient(#14161b, #14161b) 7px 9px / 62% 8px no-repeat,
+    linear-gradient(#ffa3c8, #ffa3c8) 7px 24px / 36% 7px no-repeat,
+    linear-gradient(#dde2ea, #dde2ea) 7px 38px / calc(100% - 14px) 1px no-repeat,
+    linear-gradient(#9dd2ff, #9dd2ff) calc(100% - 7px) 44px / 22% 7px no-repeat,
+    linear-gradient(#697083, #697083) 7px 45px / 40% 5px no-repeat,
+    #f4f6f9;
+}
+.sw-mix {
+  background:
+    linear-gradient(#f1efe7, #f1efe7) 7px 9px / 45% 7px no-repeat,
+    linear-gradient(#c6f135, #c6f135) calc(100% - 7px) 8px / 24% 10px no-repeat,
+    linear-gradient(#2b2a27, #2b2a27) 7px 24px / calc(100% - 14px) 1px no-repeat,
+    linear-gradient(#f1efe7, #f1efe7) 7px 32px / 52% 7px no-repeat,
+    linear-gradient(#c6f135, #c6f135) calc(100% - 7px) 31px / 24% 10px no-repeat,
+    linear-gradient(#2b2a27, #2b2a27) 7px 47px / calc(100% - 14px) 1px no-repeat,
+    #0f0f0e;
+}
+/* generat din tools/bilet.src.css, tools/bilet.extra.css — nu edita direct */
+/* Orar 1104A — "bilet de îmbarcare" + axă de timp. Fonturi native iOS: SF Pro, SF Mono, New York. */
+html[data-skin="bilet"] {
+  --bg: #eeece5;
+  --surface: #f8f7f2;
+  --raised: #ffffff;
+  --line: #d9d6cc;
+  --line-2: #c9c5b8;
+  --ink: #141413;
+  --dim: #6e6b62;
+  --faint: #a19d92;
+  --acc: #c6f135;
+  --acc-ink: #141413;
+  --warm: #ff5b2e;
+  --hatch: rgba(20, 20, 19, .06);
+
+  --sans: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, "DejaVu Sans Mono", monospace;
+  --serif: ui-serif, "New York", "Iowan Old Style", Lora, Georgia, serif;
+
+  --hour: 62px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-skin="bilet"] {
+    --bg: #0f0f0e;
+    --surface: #181816;
+    --raised: #1f1f1c;
+    --line: #2b2a27;
+    --line-2: #3a3935;
+    --ink: #f1efe7;
+    --dim: #938f85;
+    --faint: #5f5c55;
+    --hatch: rgba(241, 239, 231, .045);
+  }
+}
+
+html[data-skin="bilet"] * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html[data-skin="bilet"], html[data-skin="bilet"] body { margin: 0; background: var(--bg); color: var(--ink); }
+html[data-skin="bilet"] body {
+  font: 16px/1.35 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
+  overscroll-behavior-y: none;
+}
+html[data-skin="bilet"] button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+html[data-skin="bilet"] .mono { font-family: var(--mono); }
+
+/* ---------- top bar ---------- */
+html[data-skin="bilet"] .bar {
+  position: sticky; top: 0; z-index: 6;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 10px) 18px 10px;
+  background: var(--bg);
+}
+html[data-skin="bilet"] .brand { display: flex; align-items: center; gap: 10px; }
+html[data-skin="bilet"] .tag {
+  font: 700 13px/1 var(--mono); letter-spacing: .06em;
+  background: var(--ink); color: var(--bg); padding: 6px 8px 5px; border-radius: 4px;
+}
+html[data-skin="bilet"] .weektag { font: 500 12.5px/1 var(--mono); letter-spacing: .08em; color: var(--dim); text-transform: uppercase; }
+html[data-skin="bilet"] .weektag b { color: var(--ink); font-weight: 700; }
+html[data-skin="bilet"] .bar-actions { display: flex; align-items: center; gap: 8px; }
+html[data-skin="bilet"] .pillbtn {
+  font: 600 12.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--line-2); padding: 9px 12px 8px; border-radius: 999px;
+}
+html[data-skin="bilet"] .bell { position: relative; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-2); }
+html[data-skin="bilet"] .bell svg { width: 19px; height: 19px; fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+html[data-skin="bilet"] .bell-dot { position: absolute; top: 7px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--warm); border: 2px solid var(--bg); }
+
+/* ---------- day strip ---------- */
+html[data-skin="bilet"] .strip {
+  position: sticky; top: calc(env(safe-area-inset-top) + 58px); z-index: 5;
+  display: flex; gap: 4px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  padding: 2px 18px 12px; background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+html[data-skin="bilet"] .strip::-webkit-scrollbar { display: none; }
+html[data-skin="bilet"] .wk {
+  flex: none; writing-mode: vertical-rl; transform: rotate(180deg);
+  font: 600 10px/1 var(--mono); letter-spacing: .14em; color: var(--faint); text-transform: uppercase;
+  padding: 0 4px 0 10px; display: flex; align-items: center; justify-content: center;
+}
+html[data-skin="bilet"] .wk.gap { color: var(--warm); }
+html[data-skin="bilet"] .d {
+  flex: none; width: 46px; padding: 8px 0 7px; border-radius: 10px; scroll-snap-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative;
+}
+html[data-skin="bilet"] .d small { font: 600 10.5px/1 var(--mono); letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+html[data-skin="bilet"] .d b { font: 600 20px/1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+html[data-skin="bilet"] .d .ticks { display: flex; gap: 2px; height: 4px; }
+html[data-skin="bilet"] .d .ticks i { width: 6px; height: 3px; border-radius: 1px; background: var(--line-2); }
+html[data-skin="bilet"] .d.off b { color: var(--faint); }
+html[data-skin="bilet"] .d.today small { color: var(--warm); }
+html[data-skin="bilet"] .d[aria-pressed="true"] { background: var(--ink); }
+html[data-skin="bilet"] .d[aria-pressed="true"] small { color: var(--bg); opacity: .6; }
+html[data-skin="bilet"] .d[aria-pressed="true"] b { color: var(--bg); }
+html[data-skin="bilet"] .d[aria-pressed="true"] .ticks i { background: var(--acc); }
+
+html[data-skin="bilet"] main { max-width: 620px; margin: 0 auto; padding: 0 18px; touch-action: pan-y; }
+
+/* ---------- day head ---------- */
+html[data-skin="bilet"] .dayhead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 22px 0 16px; }
+html[data-skin="bilet"] .dayhead h2 { margin: 0; font: italic 400 40px/0.95 var(--serif); letter-spacing: -.02em; }
+html[data-skin="bilet"] .dayhead .date { font: 500 13px/1.3 var(--mono); color: var(--dim); text-align: right; text-transform: uppercase; letter-spacing: .06em; }
+html[data-skin="bilet"] .dayhead .date b { display: block; color: var(--ink); font-size: 15px; letter-spacing: .02em; }
+
+/* ---------- ticket ---------- */
+html[data-skin="bilet"] .ticket {
+  --t-bg: var(--raised); --t-ink: var(--ink); --t-dim: var(--dim); --t-line: var(--line);
+  background: var(--t-bg); color: var(--t-ink); border-radius: 18px; position: relative; margin-bottom: 26px;
+  border: 1px solid var(--t-line);
+}
+html[data-skin="bilet"] .ticket.live { --t-bg: var(--acc); --t-ink: var(--acc-ink); --t-dim: rgba(20,20,19,.62); --t-line: transparent; }
+html[data-skin="bilet"] .t-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 0; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--t-dim); }
+html[data-skin="bilet"] .t-head .blink { color: var(--t-ink); display: inline-flex; align-items: center; gap: 7px; }
+html[data-skin="bilet"] .t-head .blink::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .2; } }
+html[data-skin="bilet"] .t-main { padding: 10px 18px 18px; }
+html[data-skin="bilet"] .t-code { font: 800 64px/.9 var(--sans); letter-spacing: -.055em; margin-left: -3px; }
+html[data-skin="bilet"] .t-name { font: italic 400 19px/1.2 var(--serif); margin-top: 8px; color: var(--t-ink); }
+html[data-skin="bilet"] .t-perf { position: relative; height: 0; border-top: 1.5px dashed color-mix(in srgb, var(--t-ink) 28%, transparent); margin: 0 14px; }
+html[data-skin="bilet"] .t-perf::before, html[data-skin="bilet"] .t-perf::after {
+  content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg);
+  border: 1px solid var(--line);
+}
+html[data-skin="bilet"] .ticket.live .t-perf::before, html[data-skin="bilet"] .ticket.live .t-perf::after { border-color: transparent; }
+html[data-skin="bilet"] .t-perf::before { left: -26px; clip-path: inset(0 0 0 50%); }
+html[data-skin="bilet"] .t-perf::after { right: -26px; clip-path: inset(0 50% 0 0); }
+html[data-skin="bilet"] .t-grid { display: grid; grid-template-columns: 1fr 1fr 1.25fr; padding: 16px 18px 16px; gap: 10px; }
+html[data-skin="bilet"] .t-grid small { display: block; font: 600 10px/1 var(--mono); letter-spacing: .14em; color: var(--t-dim); text-transform: uppercase; margin-bottom: 7px; }
+html[data-skin="bilet"] .t-grid b { font: 600 21px/1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+html[data-skin="bilet"] .t-grid .gate b { font-size: 21px; font-weight: 800; }
+html[data-skin="bilet"] .t-foot { display: flex; justify-content: space-between; align-items: center; padding: 0 18px 16px; font: 500 13.5px/1.2 var(--sans); color: var(--t-dim); gap: 10px; }
+html[data-skin="bilet"] .t-foot .then { font: 500 12px/1.2 var(--mono); letter-spacing: .02em; text-align: right; }
+html[data-skin="bilet"] .t-foot .then b { color: var(--t-ink); }
+html[data-skin="bilet"] .t-bar { height: 5px; margin: 0 18px 16px; background: rgba(20,20,19,.14); border-radius: 3px; overflow: hidden; }
+html[data-skin="bilet"] .t-bar i { display: block; height: 100%; background: var(--acc-ink); border-radius: 3px; }
+
+/* ---------- timeline ---------- */
+html[data-skin="bilet"] .label-row { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 22px; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+html[data-skin="bilet"] .tl { position: relative; margin-left: 0; }
+html[data-skin="bilet"] .tl .hr { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--line); }
+html[data-skin="bilet"] .tl .hr span { position: absolute; top: -7px; left: 0; font: 500 11px/1 var(--mono); color: var(--faint); background: var(--bg); padding-right: 6px; font-variant-numeric: tabular-nums; }
+html[data-skin="bilet"] .blk {
+  position: absolute; left: 44px; right: 0; border-radius: 12px; padding: 11px 13px; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line-2);
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+html[data-skin="bilet"] .blk .r1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+html[data-skin="bilet"] .blk .code { font: 800 24px/1 var(--sans); letter-spacing: -.035em; }
+html[data-skin="bilet"] .blk .typ { font: 600 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-top: 6px; display: block; }
+html[data-skin="bilet"] .blk .room { font: 700 17px/1 var(--mono); letter-spacing: -.01em; text-align: right; }
+html[data-skin="bilet"] .blk .room small { display: block; font: 600 9.5px/1 var(--mono); letter-spacing: .16em; color: var(--dim); margin-bottom: 5px; }
+html[data-skin="bilet"] .blk .r2 { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; font-size: 13px; color: var(--dim); }
+html[data-skin="bilet"] .blk .r2 .nm { font: italic 400 14.5px/1.2 var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-skin="bilet"] .blk .r2 .hrs { font: 500 11.5px/1 var(--mono); white-space: nowrap; }
+html[data-skin="bilet"] .blk .alt { color: var(--warm); }
+html[data-skin="bilet"] .blk.L { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+html[data-skin="bilet"] .blk.L .typ, html[data-skin="bilet"] .blk.L .room small, html[data-skin="bilet"] .blk.L .r2 { color: color-mix(in srgb, var(--bg) 60%, transparent); }
+html[data-skin="bilet"] .blk.L .r2 .nm { color: var(--bg); }
+html[data-skin="bilet"] .blk.past { background: repeating-linear-gradient(-45deg, var(--hatch) 0 6px, transparent 6px 12px), var(--bg); color: var(--faint); border-color: var(--line); }
+html[data-skin="bilet"] .blk.past .typ, html[data-skin="bilet"] .blk.past .room small, html[data-skin="bilet"] .blk.past .r2, html[data-skin="bilet"] .blk.past .r2 .nm { color: var(--faint); }
+html[data-skin="bilet"] .blk.now { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
+html[data-skin="bilet"] .blk.now .typ, html[data-skin="bilet"] .blk.now .room small, html[data-skin="bilet"] .blk.now .r2 { color: rgba(20,20,19,.6); }
+html[data-skin="bilet"] .blk.now .r2 .nm { color: var(--acc-ink); }
+html[data-skin="bilet"] .pause { position: absolute; left: 44px; right: 0; display: grid; place-items: center; font: 500 10.5px/1 var(--mono); letter-spacing: .14em; color: var(--faint); text-transform: uppercase; }
+html[data-skin="bilet"] .nowline { position: absolute; left: 40px; right: -4px; height: 0; border-top: 2px solid var(--warm); z-index: 3; }
+html[data-skin="bilet"] .nowline span { position: absolute; left: -42px; top: -9px; font: 700 10.5px/1 var(--mono); color: #fff; background: var(--warm); padding: 3px 4px 2px; border-radius: 4px; letter-spacing: .02em; }
+
+/* ---------- empty ---------- */
+html[data-skin="bilet"] .free { padding: 18px 0 8px; }
+html[data-skin="bilet"] .free .big {
+  font: 900 108px/.82 var(--sans); letter-spacing: -.07em; color: transparent; -webkit-text-stroke: 1.5px var(--ink);
+  margin-left: -4px;
+}
+html[data-skin="bilet"] .free p { font: italic 400 20px/1.3 var(--serif); margin: 18px 0 0; }
+html[data-skin="bilet"] .free .nx { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; font: 500 13px/1.5 var(--mono); color: var(--dim); }
+html[data-skin="bilet"] .free .nx b { color: var(--ink); }
+html[data-skin="bilet"] .free .nx button { margin-top: 12px; }
+
+html[data-skin="bilet"] .foot { margin: 34px 0 0; font: 500 11px/1.6 var(--mono); color: var(--faint); letter-spacing: .04em; }
+
+/* ---------- sheet ---------- */
+html[data-skin="bilet"] .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.36); z-index: 20; opacity: 0; transition: opacity .25s; }
+html[data-skin="bilet"] .scrim.show { opacity: 1; }
+html[data-skin="bilet"] .sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: 92dvh; overflow-y: auto;
+  background: var(--bg); border-radius: 22px 22px 0 0; padding: 8px 18px calc(env(safe-area-inset-bottom) + 24px);
+  transform: translateY(100%); transition: transform .32s cubic-bezier(.2,.8,.2,1);
+  border-top: 1px solid var(--line-2);
+}
+html[data-skin="bilet"] .sheet.show { transform: none; }
+html[data-skin="bilet"] .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 14px; }
+html[data-skin="bilet"] .sheet h3 { font: italic 400 34px/1 var(--serif); margin: 6px 0 4px; letter-spacing: -.02em; }
+html[data-skin="bilet"] .sheet .lede { color: var(--dim); font-size: 15px; margin: 0 0 18px; }
+html[data-skin="bilet"] .state { display: flex; align-items: center; gap: 10px; font: 600 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line-2); margin-bottom: 14px; }
+html[data-skin="bilet"] .state i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+html[data-skin="bilet"] .state.on i { background: #3fbf4f; }
+html[data-skin="bilet"] .state.warn i { background: var(--warm); }
+html[data-skin="bilet"] .rows { border-top: 1px solid var(--line); margin: 6px 0 18px; }
+html[data-skin="bilet"] .row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+html[data-skin="bilet"] .row .l b { display: block; font-weight: 600; font-size: 16px; }
+html[data-skin="bilet"] .row .l span { display: block; font-size: 13px; color: var(--dim); margin-top: 2px; }
+html[data-skin="bilet"] .seg { display: flex; border: 1px solid var(--line-2); border-radius: 9px; overflow: hidden; flex: none; }
+html[data-skin="bilet"] .seg button { font: 600 13px/1 var(--mono); padding: 9px 10px; min-width: 40px; }
+html[data-skin="bilet"] .seg button + button { border-left: 1px solid var(--line-2); }
+html[data-skin="bilet"] .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+html[data-skin="bilet"] .tog { width: 50px; height: 30px; border-radius: 999px; border: 1px solid var(--line-2); position: relative; flex: none; transition: background .2s; }
+html[data-skin="bilet"] .tog::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
+html[data-skin="bilet"] .tog[aria-checked="true"] { background: var(--acc); border-color: var(--acc); }
+html[data-skin="bilet"] .tog[aria-checked="true"]::after { transform: translateX(20px); background: var(--acc-ink); }
+html[data-skin="bilet"] .btn { display: block; width: 100%; text-align: center; padding: 16px; border-radius: 12px; font: 700 13px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; background: var(--ink); color: var(--bg); }
+html[data-skin="bilet"] .btn.acc { background: var(--acc); color: var(--acc-ink); }
+html[data-skin="bilet"] .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-2); }
+html[data-skin="bilet"] .btn.danger { background: transparent; color: var(--warm); }
+html[data-skin="bilet"] .btn + .btn { margin-top: 10px; }
+html[data-skin="bilet"] .steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 18px; }
+html[data-skin="bilet"] .steps li { counter-increment: s; position: relative; padding: 10px 0 10px 38px; border-bottom: 1px solid var(--line); font-size: 15px; }
+html[data-skin="bilet"] .steps li::before { content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 11px; font: 700 12px/1 var(--mono); color: var(--warm); letter-spacing: .04em; }
+html[data-skin="bilet"] .steps code { font: 600 13px/1 var(--mono); background: var(--surface); border: 1px solid var(--line); padding: 2px 5px; border-radius: 4px; }
+html[data-skin="bilet"] .codebox { font: 500 11px/1.45 var(--mono); word-break: break-all; background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; padding: 12px; max-height: 96px; overflow: hidden; color: var(--dim); position: relative; margin-bottom: 10px; }
+html[data-skin="bilet"] .codebox::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(transparent, var(--surface)); }
+html[data-skin="bilet"] .small { font-size: 13px; color: var(--dim); line-height: 1.5; margin: 12px 0 0; }
+html[data-skin="bilet"] .sect { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 26px 0 10px; }
+
+html[data-skin="bilet"] .toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 12px); transform: translate(-50%, -16px);
+  background: var(--ink); color: var(--bg); padding: 11px 16px 10px; border-radius: 10px;
+  font: 600 12px/1.3 var(--mono); letter-spacing: .04em; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 40; max-width: calc(100% - 36px); text-align: center;
+}
+html[data-skin="bilet"] .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) { html[data-skin="bilet"] *, html[data-skin="bilet"] *::before { animation: none !important; transition: none !important; } }
+
+/* ===== Bilet: componente comune (setări) + layout-ul cu taburi (tema v2+v4) ===== */
+
+/* setări (același markup în panoul de jos și în pagina de setări) */
+html[data-skin="bilet"] .title { margin: 0; font: italic 400 40px/1 var(--serif); letter-spacing: -.02em; }
+html[data-skin="bilet"] .sheet .title { font-size: 34px; margin-top: 6px; }
+html[data-skin="bilet"] .lede { color: var(--dim); font-size: 15px; margin: 8px 0 18px; }
+html[data-skin="bilet"] .h2 { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 26px 0 10px; }
+html[data-skin="bilet"] .status { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line-2); font: 600 12px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+html[data-skin="bilet"] .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+html[data-skin="bilet"] .status.on i { background: #3fbf4f; }
+html[data-skin="bilet"] .status.warn i { background: var(--warm); }
+html[data-skin="bilet"] .status span { display: block; font: 400 13.5px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--dim); margin-top: 4px; }
+html[data-skin="bilet"] .group { border-top: 1px solid var(--line); }
+html[data-skin="bilet"] .opt { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+html[data-skin="bilet"] .opt b { display: block; font-weight: 600; }
+html[data-skin="bilet"] .opt span { font-size: 13px; color: var(--dim); }
+html[data-skin="bilet"] .steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 16px; }
+html[data-skin="bilet"] .steps a { color: var(--ink); font-weight: 600; text-decoration-color: var(--acc); text-decoration-thickness: 3px; }
+html[data-skin="bilet"] .btn.plain { background: transparent; color: var(--ink); border: 1px solid var(--line-2); }
+html[data-skin="bilet"] .btn:not(.plain):not(.danger) { background: var(--acc); color: var(--acc-ink); }
+html[data-skin="bilet"] .btn { margin-top: 10px; }
+html[data-skin="bilet"] .foot { margin: 34px 0 0; font: 500 11px/1.6 var(--mono); color: var(--faint); letter-spacing: .04em; }
+html[data-skin="bilet"] code { font: 600 12.5px/1 var(--mono); background: var(--surface); border: 1px solid var(--line); padding: 2px 5px; border-radius: 4px; }
+
+/* layout cu taburi */
+html[data-skin="bilet"][data-layout="tabs"] body { padding-bottom: 0; }
+html[data-skin="bilet"][data-layout="tabs"] main { padding: calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 96px); }
+html[data-skin="bilet"] .date { margin: 0 0 6px; font: 500 12.5px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+html[data-skin="bilet"] .date b { color: var(--ink); }
+html[data-skin="bilet"] .pagehead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+
+html[data-skin="bilet"] .list-title { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 4px; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+html[data-skin="bilet"] .list-title small { font: inherit; }
+html[data-skin="bilet"] .list { list-style: none; margin: 0; padding: 0; }
+html[data-skin="bilet"] .item { display: grid; grid-template-columns: 50px 1fr auto; gap: 3px 12px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+html[data-skin="bilet"] .item .t { font: 600 16px/1.2 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+html[data-skin="bilet"] .item .t span { display: block; font-weight: 400; font-size: 13px; color: var(--dim); margin-top: 3px; }
+html[data-skin="bilet"] .item .n { font: 700 17px/1.2 var(--sans); letter-spacing: -.01em; text-wrap: pretty; }
+html[data-skin="bilet"] .item .desc { font: italic 400 14.5px/1.3 var(--serif); color: var(--dim); margin-top: 4px; }
+html[data-skin="bilet"] .item .desc .alt { color: var(--warm); font-style: normal; font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+html[data-skin="bilet"] .item .r { font: 700 15px/1 var(--mono); padding-top: 2px; white-space: nowrap; }
+html[data-skin="bilet"] .mark { background: var(--acc); color: var(--acc-ink); padding: 4px 6px 3px; border-radius: 5px; display: inline-block; }
+html[data-skin="bilet"] .item.past { opacity: .4; }
+html[data-skin="bilet"] .item.past .mark { background: transparent; color: var(--dim); border: 1px solid var(--line-2); }
+html[data-skin="bilet"] .item.now { background: repeating-linear-gradient(-45deg, var(--hatch) 0 6px, transparent 6px 12px); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 10px; border-bottom-color: transparent; }
+html[data-skin="bilet"] .item.now .n::after { content: "acum"; margin-left: 8px; font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--warm); vertical-align: 3px; }
+html[data-skin="bilet"] .gap { list-style: none; font: 500 10.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); padding: 10px 0 10px 62px; border-bottom: 1px solid var(--line); }
+html[data-skin="bilet"] .empty { font: italic 400 20px/1.3 var(--serif); color: var(--dim); padding: 8px 0; }
+
+html[data-skin="bilet"] .arrows { display: flex; gap: 8px; }
+html[data-skin="bilet"] .arrow { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+html[data-skin="bilet"] .arrow svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html[data-skin="bilet"] .arrow:disabled { opacity: .3; }
+html[data-skin="bilet"] .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 0 0 26px; }
+html[data-skin="bilet"] .day { padding: 9px 0 8px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+html[data-skin="bilet"] .day > span:first-child { font: 600 10.5px/1 var(--mono); letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+html[data-skin="bilet"] .day b { font: 600 20px/1 var(--mono); letter-spacing: -.02em; }
+html[data-skin="bilet"] .day .ink { display: flex; gap: 2px; height: 4px; }
+html[data-skin="bilet"] .day .ink i { width: 6px; height: 3px; border-radius: 1px; background: var(--line-2); }
+html[data-skin="bilet"] .day.today > span:first-child { color: var(--warm); }
+html[data-skin="bilet"] .day[aria-pressed="true"] { background: var(--ink); }
+html[data-skin="bilet"] .day[aria-pressed="true"] b, html[data-skin="bilet"] .day[aria-pressed="true"] > span:first-child { color: var(--bg); }
+html[data-skin="bilet"] .day[aria-pressed="true"] .ink i { background: var(--acc); }
+html[data-skin="bilet"] .subjects { list-style: none; margin: 34px 0 0; padding: 0; border-top: 1px solid var(--line); }
+html[data-skin="bilet"] .subjects li { padding: 10px 0; border-bottom: 1px solid var(--line); font: italic 400 16px/1.3 var(--serif); }
+html[data-skin="bilet"] .subjects b { font: 700 12px/1 var(--mono); letter-spacing: .06em; display: inline-block; min-width: 54px; font-style: normal; }
+html[data-skin="bilet"] .subjects .mark { padding: 3px 5px 2px; }
+
+html[data-skin="bilet"] .tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 8px 0 calc(env(safe-area-inset-bottom) + 6px); background: var(--bg); border-top: 1px solid var(--line);
+}
+html[data-skin="bilet"] .tabs button { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); position: relative; }
+html[data-skin="bilet"] .tabs svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+html[data-skin="bilet"] .tabs button[aria-current="page"] { color: var(--ink); }
+html[data-skin="bilet"] .tabs button[aria-current="page"]::after { content: ""; position: absolute; top: -9px; width: 26px; height: 3px; border-radius: 0 0 3px 3px; background: var(--acc); }
+html[data-skin="bilet"] .dot { position: absolute; top: -2px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--warm); border: 2px solid var(--bg); }
+html[data-skin="bilet"][data-layout="tabs"] .ticket { margin-top: 18px; }
+html[data-skin="bilet"][data-layout="tabs"] .free { padding-top: 10px; margin-bottom: 26px; }
+
+/* alegerea temei */
+html[data-skin="bilet"] .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+html[data-skin="bilet"] .theme { border: 1px solid var(--line-2); border-radius: 12px; padding: 8px 8px 10px; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+html[data-skin="bilet"] .theme b { font: 700 12px/1.1 var(--mono); letter-spacing: .04em; }
+html[data-skin="bilet"] .theme > span:last-child { font-size: 11.5px; color: var(--dim); line-height: 1.25; }
+html[data-skin="bilet"] .theme[aria-pressed="true"] { border: 2px solid var(--acc); padding: 7px 7px 9px; }
+/* generat din tools/marker.src.css, tools/marker.extra.css — nu edita direct */
+/* Orar 1104A
+   Ideea: orarul printat pe care îl marchezi cu markere. Sala și ora sunt „trase cu markerul”
+   în culoarea materiei; restul rămâne liniștit. Fonturi native iOS: SF Pro Rounded + SF Pro. */
+html[data-skin="marker"] {
+  --paper: #f4f6f9;
+  --ink: #14161b;
+  --muted: #697083;
+  --line: #dde2ea;
+  --navy: #1f3a6e;
+  --sheet: #ffffff;
+
+  --hl-yellow: #ffe45c;
+  --hl-pink: #ffa3c8;
+  --hl-green: #a3eb8f;
+  --hl-blue: #9dd2ff;
+  --hl-orange: #ffbd73;
+  --hl-violet: #cdb2ff;
+  --hl-cyan: #8ae6e2;
+  --hl-alpha: 1;
+
+  --round: ui-rounded, "SF Pro Rounded", -apple-system, "Nunito", "Helvetica Neue", Arial, sans-serif;
+  --text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-skin="marker"] {
+    --paper: #14161b;
+    --ink: #eef0f4;
+    --muted: #9097a8;
+    --line: #2a2e37;
+    --navy: #9db8ff;
+    --sheet: #1c1f26;
+    --hl-alpha: .38;
+  }
+}
+
+html[data-skin="marker"] * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html[data-skin="marker"], html[data-skin="marker"] body { margin: 0; background: var(--paper); color: var(--ink); }
+html[data-skin="marker"] body { font: 16px/1.4 var(--text); -webkit-font-smoothing: antialiased; }
+html[data-skin="marker"] button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+html[data-skin="marker"] :focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; border-radius: 6px; }
+
+html[data-skin="marker"] main {
+  max-width: 560px; margin: 0 auto;
+  padding: calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 96px);
+}
+
+/* ---------- culorile materiilor ---------- */
+html[data-skin="marker"] [data-c="CM1"] { --hl: var(--hl-violet); }
+html[data-skin="marker"] [data-c="AM"] { --hl: var(--hl-blue); }
+html[data-skin="marker"] [data-c="ALGA"] { --hl: var(--hl-cyan); }
+html[data-skin="marker"] [data-c="BFC"] { --hl: var(--hl-orange); }
+html[data-skin="marker"] [data-c="PC1"] { --hl: var(--hl-green); }
+html[data-skin="marker"] [data-c="Fiz"] { --hl: var(--hl-pink); }
+html[data-skin="marker"] [data-c="SP1"] { --hl: var(--hl-yellow); }
+
+/* trăsătura de marker: jumătatea de jos a textului, capete ușor neregulate */
+html[data-skin="marker"] .mark {
+  padding: 0 .18em;
+  margin: 0 -.06em;
+  background:
+    linear-gradient(100deg, transparent .12em, color-mix(in srgb, var(--hl) calc(var(--hl-alpha) * 100%), transparent) .12em, color-mix(in srgb, var(--hl) calc(var(--hl-alpha) * 100%), transparent) calc(100% - .08em), transparent calc(100% - .08em))
+    0 62% / 100% 58% no-repeat;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  border-radius: .12em .3em .18em .35em;
+}
+
+/* ---------- antetul fiecărui ecran ---------- */
+html[data-skin="marker"] .date { font-size: 15px; color: var(--muted); margin: 0; }
+html[data-skin="marker"] .title { font: 700 34px/1.08 var(--round); letter-spacing: -.01em; margin: 2px 0 0; }
+
+/* ---------- „acum / urmează” ---------- */
+html[data-skin="marker"] .hero { margin: 26px 0 34px; }
+html[data-skin="marker"] .hero .when { font-size: 16px; color: var(--muted); margin: 0 0 6px; }
+html[data-skin="marker"] .hero .when b { color: var(--ink); font-weight: 600; }
+html[data-skin="marker"] .hero h1 { font: 700 42px/1.02 var(--round); letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+html[data-skin="marker"] .hero .where { font: 500 23px/1.35 var(--round); margin: 10px 0 0; }
+html[data-skin="marker"] .hero .who { font-size: 15px; color: var(--muted); margin: 6px 0 0; }
+html[data-skin="marker"] .hero .left { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 15px; color: var(--muted); }
+html[data-skin="marker"] .hero .left .track { flex: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+html[data-skin="marker"] .hero .left .track i { display: block; height: 100%; background: var(--ink); border-radius: 2px; }
+html[data-skin="marker"] .hero .then { margin: 16px 0 0; font-size: 15px; color: var(--muted); }
+html[data-skin="marker"] .hero .then b, html[data-skin="marker"] .hero .then .mark { color: var(--ink); font-weight: 600; }
+html[data-skin="marker"] .hero.quiet h1 { font-size: 36px; }
+
+/* ---------- listă de ore ---------- */
+html[data-skin="marker"] .list-title { font: 600 20px/1.2 var(--round); margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+html[data-skin="marker"] .list-title small { font: 400 14px var(--text); color: var(--muted); }
+html[data-skin="marker"] .list { list-style: none; margin: 0; padding: 0; }
+html[data-skin="marker"] .item { display: grid; grid-template-columns: 52px 1fr auto; gap: 4px 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
+html[data-skin="marker"] .item:last-child { border-bottom: 0; }
+html[data-skin="marker"] .item .t { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; line-height: 1.25; }
+html[data-skin="marker"] .item .t span { display: block; font-weight: 400; font-size: 14px; color: var(--muted); }
+html[data-skin="marker"] .item .n { font-weight: 600; font-size: 16px; line-height: 1.25; text-wrap: pretty; }
+html[data-skin="marker"] .item .desc { font-size: 14px; color: var(--muted); margin-top: 3px; }
+html[data-skin="marker"] .item .desc .alt { color: var(--ink); }
+html[data-skin="marker"] .item .r { font: 600 17px/1.2 var(--round); text-align: right; white-space: nowrap; padding-top: 1px; }
+html[data-skin="marker"] .item.past { opacity: .42; }
+html[data-skin="marker"] .item.now .t { color: var(--ink); }
+html[data-skin="marker"] .item.now .n::after { content: "acum"; margin-left: 8px; font-size: 12px; font-weight: 600; color: var(--paper); background: var(--ink); padding: 2px 6px; border-radius: 5px; vertical-align: 2px; }
+html[data-skin="marker"] .gap { font-size: 13.5px; color: var(--muted); padding: 8px 0 8px 66px; border-bottom: 1px solid var(--line); }
+
+html[data-skin="marker"] .empty { font: 500 19px/1.4 var(--round); color: var(--muted); padding: 10px 0; }
+
+/* ---------- săptămâna ---------- */
+html[data-skin="marker"] .weekhead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+html[data-skin="marker"] .arrows { display: flex; gap: 6px; padding-bottom: 4px; }
+html[data-skin="marker"] .arrow { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--sheet); border: 1px solid var(--line); }
+html[data-skin="marker"] .arrow svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+html[data-skin="marker"] .arrow:disabled { opacity: .3; }
+html[data-skin="marker"] .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 22px 0 26px; }
+html[data-skin="marker"] .day { padding: 9px 0 8px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+html[data-skin="marker"] .day span { font-size: 13px; color: var(--muted); }
+html[data-skin="marker"] .day b { font: 600 21px/1.1 var(--round); font-variant-numeric: tabular-nums; }
+html[data-skin="marker"] .day .ink { display: flex; gap: 3px; margin-top: 4px; height: 6px; }
+html[data-skin="marker"] .day .ink i { width: 6px; height: 6px; border-radius: 50%; background: var(--hl); }
+html[data-skin="marker"] .day.today span { color: var(--navy); font-weight: 600; }
+html[data-skin="marker"] .day[aria-pressed="true"] { background: var(--ink); }
+html[data-skin="marker"] .day[aria-pressed="true"] span, html[data-skin="marker"] .day[aria-pressed="true"] b { color: var(--paper); }
+html[data-skin="marker"] .subjects { margin: 38px 0 0; padding: 0; list-style: none; font-size: 15px; }
+html[data-skin="marker"] .subjects li { padding: 7px 0; }
+html[data-skin="marker"] .subjects b { font-weight: 600; margin-right: 6px; }
+
+/* ---------- notificări ---------- */
+html[data-skin="marker"] .lede { color: var(--muted); margin: 8px 0 22px; font-size: 16px; }
+html[data-skin="marker"] .status { display: flex; align-items: center; gap: 10px; background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; font-weight: 600; }
+html[data-skin="marker"] .status i { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+html[data-skin="marker"] .status.on i { background: #2fb350; }
+html[data-skin="marker"] .status.warn i { background: #f08c00; }
+html[data-skin="marker"] .status span { font-weight: 400; color: var(--muted); display: block; font-size: 14px; }
+html[data-skin="marker"] .h2 { font: 600 20px/1.2 var(--round); margin: 30px 0 8px; }
+html[data-skin="marker"] .steps { margin: 0 0 14px; padding-left: 22px; }
+html[data-skin="marker"] .steps li { padding: 5px 0; }
+html[data-skin="marker"] .steps a { color: var(--navy); font-weight: 600; }
+html[data-skin="marker"] code { font: 600 14px var(--text); background: color-mix(in srgb, var(--hl-yellow) calc(var(--hl-alpha) * 100%), transparent); padding: 0 4px; border-radius: 4px; }
+html[data-skin="marker"] .codebox { font: 12px/1.45 ui-monospace, Menlo, monospace; word-break: break-all; color: var(--muted); background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 12px; max-height: 78px; overflow: hidden; }
+html[data-skin="marker"] .group { background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; }
+html[data-skin="marker"] .opt { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 0; }
+html[data-skin="marker"] .opt + .opt { border-top: 1px solid var(--line); }
+html[data-skin="marker"] .opt b { font-weight: 600; display: block; }
+html[data-skin="marker"] .opt span { font-size: 14px; color: var(--muted); }
+html[data-skin="marker"] .seg { display: flex; background: var(--paper); border-radius: 9px; padding: 2px; flex: none; }
+html[data-skin="marker"] .seg button { padding: 6px 10px; border-radius: 7px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+html[data-skin="marker"] .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+html[data-skin="marker"] .tog { width: 51px; height: 31px; border-radius: 999px; background: var(--line); position: relative; flex: none; transition: background .2s; }
+html[data-skin="marker"] .tog::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+html[data-skin="marker"] .tog[aria-checked="true"] { background: #2fb350; }
+html[data-skin="marker"] .tog[aria-checked="true"]::after { transform: translateX(20px); }
+html[data-skin="marker"] .btn { display: block; width: 100%; padding: 15px; margin-top: 12px; border-radius: 14px; background: var(--navy); color: #fff; font: 600 17px var(--round); text-align: center; }
+@media (prefers-color-scheme: dark) { html[data-skin="marker"] .btn { color: #0f1a33; } }
+html[data-skin="marker"] .btn.plain { background: var(--sheet); color: var(--navy); border: 1px solid var(--line); }
+html[data-skin="marker"] .btn.danger { background: none; color: #e5484d; }
+html[data-skin="marker"] .small { font-size: 14px; color: var(--muted); margin: 12px 0 0; }
+html[data-skin="marker"] .foot { font-size: 13px; color: var(--muted); margin: 40px 0 0; }
+
+/* ---------- bara de jos ---------- */
+html[data-skin="marker"] .tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 6px 0 calc(env(safe-area-inset-bottom) + 4px);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid var(--line);
+}
+html[data-skin="marker"] .tabs button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: var(--muted); position: relative; padding: 2px 0; }
+html[data-skin="marker"] .tabs svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+html[data-skin="marker"] .tabs button[aria-current="page"] { color: var(--ink); }
+html[data-skin="marker"] .tabs button[aria-current="page"] svg { stroke-width: 2.1; }
+html[data-skin="marker"] .dot { position: absolute; top: 2px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: #e5484d; border: 2px solid var(--paper); }
+
+html[data-skin="marker"] .toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 10px); transform: translate(-50%, -10px);
+  background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 12px; font-size: 15px; font-weight: 500;
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 40; max-width: calc(100% - 32px); text-align: center;
+}
+html[data-skin="marker"] .toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { html[data-skin="marker"] * { transition: none !important; } }
+
+/* ===== Marker: alegerea temei ===== */
+html[data-skin="marker"] .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+html[data-skin="marker"] .theme { background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 8px 8px 10px; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+html[data-skin="marker"] .theme b { font: 600 14px/1.15 var(--round); }
+html[data-skin="marker"] .theme > span:last-child { font-size: 12px; color: var(--muted); line-height: 1.25; }
+html[data-skin="marker"] .theme[aria-pressed="true"] { border: 2px solid var(--navy); padding: 7px 7px 9px; }
+html[data-skin="marker"] .title + .lede { margin-top: 8px; }
