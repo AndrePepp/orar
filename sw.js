@@ -1,5 +1,5 @@
 // Service worker: funcționare offline + afișarea notificărilor push.
-const VERSION = 'orar-1104a-v5b';
+const VERSION = 'orar-1104a-v5c';
 const ASSETS = ['./', 'index.html', 'app.css', 'app.js', 'schedule.js', 'manifest.webmanifest',
   'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
