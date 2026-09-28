@@ -1,60 +1,109 @@
 // Orar 1104A — AIA anul I, semestrul I 2026-2027
-// Sursa: Orar_AC_2026-2027_sem_I_v04.xlsx, foaia L-I-AIA, coloana I (1104A)
-// + cursurile comune ale seriei (C:L), cu durata dată de celulele îmbinate.
-// Fișierul e folosit și de PWA, și de serverul de notificări (worker/src/schedule.js e o copie).
+// Sursa implicită: Orar_AC_2026-2027_sem_I_v10.xlsx, foaia L-I-AIA, coloana 1104A
+// + cursurile comune ale seriei, cu durata dată de celulele îmbinate.
+// Orarul se poate înlocui din mers cu setSchedule(date) (actualizare din Cloudflare).
+// Fișierul e folosit și de aplicație, și de robotul de notificări.
 
 export const GROUP = '1104A';
 export const TZ = 'Europe/Bucharest';
-
-export const SUBJECTS = {
-  CM1:  { name: 'Complemente de matematică I', color: '#8b5cf6' },
-  AM:   { name: 'Analiză matematică', color: '#3b82f6' },
-  ALGA: { name: 'Algebră liniară și geometrie analitică', color: '#06b6d4' },
-  BFC:  { name: 'Bazele funcționării calculatoarelor', color: '#f59e0b' },
-  PC1:  { name: 'Programarea calculatoarelor I', color: '#10b981' },
-  Fiz:  { name: 'Fizică', color: '#ef4444' },
-  SP1:  { name: 'Sport I', color: '#ec4899' },
-};
-
 export const TYPES = { C: 'Curs', S: 'Seminar', L: 'Laborator', P: 'Proiect', SP: 'Sport' };
 export const PERIODICITY = { s: 'săptămânal', p: 'săptămâni pare', i: 'săptămâni impare' };
+const PALETTE = ['#8b5cf6', '#3b82f6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#84cc16', '#f97316', '#6366f1', '#14b8a6', '#a855f7'];
 
-// day: 1 = Luni … 5 = Vineri
-export const EVENTS = [
-  { day: 1, start: '08:00', end: '10:00', code: 'CM1',  type: 'C', per: 's', prof: 'lect. dr. G. Grosu',     room: 'T4' },
-  { day: 1, start: '10:00', end: '12:00', code: 'AM',   type: 'C', per: 's', prof: 'lect. dr. G. Grosu',     room: 'T4' },
-  { day: 1, start: '14:00', end: '16:00', code: 'Fiz',  type: 'S', per: 'p', prof: 'conf. dr. B. Ciobanu',   room: 'AC2-2' },
-
-  { day: 2, start: '12:00', end: '14:00', code: 'SP1',  type: 'SP', per: 's', prof: 'asoc. dr. A. Ursaru',   room: 'Sport2' },
-  { day: 2, start: '14:00', end: '16:00', code: 'BFC',  type: 'C', per: 's', prof: 'ș.l. dr. A. Ioan',       room: 'T4' },
-  { day: 2, start: '16:00', end: '18:00', code: 'ALGA', type: 'C', per: 's', prof: 'prof. dr. D. Fetcu',     room: 'T4' },
-
-  { day: 3, start: '10:00', end: '12:00', code: 'BFC',  type: 'L', per: 's', prof: 'ș.l. dr. A. Ioan',       room: 'A2-7' },
-  { day: 3, start: '12:00', end: '14:00', code: 'Fiz',  type: 'L', per: 's', prof: 'ș.l. dr. T. Coman',      room: 'T-Et4-L1' },
-  { day: 3, start: '14:00', end: '17:00', code: 'PC1',  type: 'L', per: 's', prof: 'asist. dr. A. Botezatu', room: 'A1-13' },
-
-  { day: 4, start: '08:00', end: '11:00', code: 'AM',   type: 'S', per: 's', prof: 'lect. dr. G. Grosu',     room: 'AC3-3' },
-  { day: 4, start: '11:00', end: '14:00', code: 'ALGA', type: 'S', per: 's', prof: 'lect. dr. G. Crețu',     room: 'AC0-3' },
-  { day: 4, start: '14:00', end: '16:00', code: 'PC1',  type: 'C', per: 's', prof: 'asoc. dr. B. Burlacu',   room: 'T4' },
-
-  { day: 5, start: '08:00', end: '10:00', code: 'Fiz',  type: 'C', per: 's', prof: 'conf. dr. B. Ciobanu',   room: 'T4' },
-].map((e, i) => ({ ...e, id: `e${i}`, name: SUBJECTS[e.code].name, color: SUBJECTS[e.code].color }));
-
-// Structura semestrului I 2026-2027 (TUIASI):
-// 28.09–18.12.2026 activitate (săpt. 1–12), 19.12–03.01 vacanță, 04.01–15.01.2027 activitate (săpt. 13–14)
-export const TEACHING_BLOCKS = [
-  { start: '2026-09-28', weeks: 12, first: 1 },
-  { start: '2027-01-04', weeks: 2, first: 13 },
-];
-// Zile libere legale care cad în zile de curs
-export const HOLIDAYS = {
-  '2026-11-30': 'Sfântul Andrei',
-  '2026-12-01': 'Ziua Națională',
-  '2027-01-06': 'Boboteaza',
-  '2027-01-07': 'Sfântul Ioan',
+// ---- orarul implicit (inclus în aplicație) ----
+export const DEFAULT_SCHEDULE = {
+  version: 'v10',
+  source: 'Orar_AC_2026-2027_sem_I_v10.xlsx',
+  subjects: {
+    CM1: 'Complemente de matematică I',
+    AM: 'Analiză matematică',
+    ALGA: 'Algebră liniară și geometrie analitică',
+    BFC: 'Bazele funcționării calculatoarelor',
+    PC1: 'Programarea calculatoarelor I',
+    Fiz: 'Fizică',
+    SP1: 'Sport I',
+  },
+  // day: 1 = Luni … 5 = Vineri; type: C/S/L/P/SP; per: s (săptămânal) / p (pare) / i (impare)
+  events: [
+    { day: 1, start: '08:00', end: '10:00', code: 'CM1',  type: 'C', per: 's', prof: 'lect. dr. G. Grosu',     room: 'T4' },
+    { day: 1, start: '10:00', end: '12:00', code: 'AM',   type: 'C', per: 's', prof: 'lect. dr. G. Grosu',     room: 'T4' },
+    { day: 1, start: '14:00', end: '16:00', code: 'Fiz',  type: 'S', per: 'p', prof: 'conf. dr. B. Ciobanu',   room: 'AC2-2' },
+    { day: 2, start: '12:00', end: '14:00', code: 'SP1',  type: 'SP', per: 's', prof: 'asoc. dr. A. Ursaru',   room: 'Sport2' },
+    { day: 2, start: '14:00', end: '16:00', code: 'BFC',  type: 'C', per: 's', prof: 'ș.l. dr. A. Ioan',       room: 'T4' },
+    { day: 2, start: '16:00', end: '18:00', code: 'ALGA', type: 'C', per: 's', prof: 'prof. dr. D. Fetcu',     room: 'T4' },
+    { day: 3, start: '10:00', end: '12:00', code: 'BFC',  type: 'L', per: 's', prof: 'ș.l. dr. A. Ioan',       room: 'A2-7' },
+    { day: 3, start: '12:00', end: '14:00', code: 'Fiz',  type: 'L', per: 's', prof: 'ș.l. dr. T. Coman',      room: 'T-Et4-L1' },
+    { day: 3, start: '14:00', end: '17:00', code: 'PC1',  type: 'L', per: 's', prof: 'asist. dr. A. Botezatu', room: 'A1-13' },
+    { day: 4, start: '08:00', end: '11:00', code: 'AM',   type: 'S', per: 's', prof: 'lect. dr. G. Grosu',     room: 'AC3-3' },
+    { day: 4, start: '11:00', end: '14:00', code: 'ALGA', type: 'S', per: 's', prof: 'lect. dr. G. Crețu',     room: 'AC0-3' },
+    { day: 4, start: '14:00', end: '16:00', code: 'PC1',  type: 'C', per: 's', prof: 'asoc. dr. B. Burlacu',   room: 'T4' },
+    { day: 5, start: '08:00', end: '10:00', code: 'Fiz',  type: 'C', per: 's', prof: 'conf. dr. B. Ciobanu',   room: 'T4' },
+  ],
+  // Structura semestrului I 2026-2027 (TUIASI): 28.09–18.12 (săpt. 1–12), vacanță 19.12–03.01, 04.01–15.01 (săpt. 13–14)
+  blocks: [
+    { start: '2026-09-28', weeks: 12, first: 1 },
+    { start: '2027-01-04', weeks: 2, first: 13 },
+  ],
+  holidays: {
+    '2026-11-30': 'Sfântul Andrei',
+    '2026-12-01': 'Ziua Națională',
+    '2027-01-06': 'Boboteaza',
+    '2027-01-07': 'Sfântul Ioan',
+  },
 };
-export const SEMESTER_START = '2026-09-28';
-export const SEMESTER_END = '2027-01-15';
+
+// ---- starea curentă (se schimbă la actualizare) ----
+export let VERSION = '';
+export let SOURCE = '';
+export let SUBJECTS = {};
+export let EVENTS = [];
+export let TEACHING_BLOCKS = [];
+export let HOLIDAYS = {};
+export let SEMESTER_START = '';
+export let SEMESTER_END = '';
+
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+const YMD = /^\d{4}-\d{2}-\d{2}$/;
+/** Verifică un orar primit din afară. Întoarce null dacă e bun, altfel textul erorii. */
+export function validateSchedule(d) {
+  if (!d || typeof d !== 'object') return 'date lipsă';
+  if (!Array.isArray(d.events) || d.events.length === 0 || d.events.length > 80) return 'lista de ore lipsește sau e prea mare';
+  for (const [i, e] of d.events.entries()) {
+    if (!(e.day >= 1 && e.day <= 6)) return `ora ${i + 1}: zi invalidă`;
+    if (!HHMM.test(e.start) || !HHMM.test(e.end) || e.start >= e.end) return `ora ${i + 1}: interval invalid`;
+    if (typeof e.code !== 'string' || !e.code || e.code.length > 12) return `ora ${i + 1}: cod invalid`;
+    if (!TYPES[e.type]) return `ora ${i + 1}: tip invalid`;
+    if (!PERIODICITY[e.per]) return `ora ${i + 1}: frecvență invalidă`;
+    if (typeof e.room !== 'string' || typeof e.prof !== 'string') return `ora ${i + 1}: sală/profesor lipsă`;
+  }
+  if (d.blocks && (!Array.isArray(d.blocks) || !d.blocks.every((b) => YMD.test(b.start) && b.weeks > 0 && b.first > 0))) return 'săptămâni invalide';
+  if (d.holidays && (typeof d.holidays !== 'object' || !Object.keys(d.holidays).every((k) => YMD.test(k)))) return 'zile libere invalide';
+  return null;
+}
+
+/** Înlocuiește orarul folosit de aplicație / robot. */
+export function setSchedule(d) {
+  const err = validateSchedule(d);
+  if (err) throw new Error('Orar invalid: ' + err);
+  const names = { ...DEFAULT_SCHEDULE.subjects, ...(d.subjects || {}) };
+  const codes = [...new Set(d.events.map((e) => e.code))];
+  SUBJECTS = {};
+  codes.forEach((c, i) => {
+    const known = Object.keys(DEFAULT_SCHEDULE.subjects).indexOf(c);
+    SUBJECTS[c] = { name: String(names[c] || c), color: PALETTE[(known >= 0 ? known : i + 7) % PALETTE.length] };
+  });
+  EVENTS = d.events.map((e, i) => ({
+    day: e.day, start: e.start, end: e.end, code: e.code, type: e.type, per: e.per, prof: String(e.prof), room: String(e.room),
+    id: `e${i}`, name: SUBJECTS[e.code].name, color: SUBJECTS[e.code].color,
+  }));
+  TEACHING_BLOCKS = (d.blocks || DEFAULT_SCHEDULE.blocks).map((b) => ({ start: b.start, weeks: Number(b.weeks), first: Number(b.first) }));
+  HOLIDAYS = { ...(d.holidays || DEFAULT_SCHEDULE.holidays) };
+  VERSION = String(d.version || '');
+  SOURCE = String(d.source || '');
+  SEMESTER_START = TEACHING_BLOCKS[0].start;
+  const last = TEACHING_BLOCKS[TEACHING_BLOCKS.length - 1];
+  SEMESTER_END = addDays(last.start, last.weeks * 7 - 3); // vinerea ultimei săptămâni
+}
 
 // ---- utilitare pe date "YYYY-MM-DD" (fără fus orar, fără probleme de DST) ----
 const toUTC = (ymd) => { const [y, m, d] = ymd.split('-').map(Number); return Date.UTC(y, m - 1, d); };
@@ -165,3 +214,6 @@ export function buildICS(alarmMinutes = 15) {
   lines.push('END:VCALENDAR');
   return lines.map(fold).join('\r\n') + '\r\n';
 }
+
+
+setSchedule(DEFAULT_SCHEDULE);

@@ -64,6 +64,10 @@ function dayWord(ymd) {
   return `${DAY[S.dayOfWeek(ymd)].toLowerCase()}, ${dm(ymd)}`;
 }
 
+// data-c + culoare pentru materii care nu au culoare în CSS (apar la un orar nou)
+const KNOWN_CODES = new Set(['CM1','AM','ALGA','BFC','PC1','Fiz','SP1']);
+const dc = (code) => `data-c="${h(code)}"${KNOWN_CODES.has(code) ? '' : ` style="--hl:${S.SUBJECTS[code]?.color || '#cfd4dc'}"`}`;
+
 // ---------- teme ----------
 const THEMES = {
   v2: { layout: 'strip', skin: 'bilet', name: 'Bilet', desc: 'bilet mare și axă de timp', bar: '#0f0f0e', barLight: '#eeece5' },
@@ -84,12 +88,15 @@ function applyTheme() {
 }
 
 // ---------- săptămânile semestrului ----------
-const SEM_DAYS = (() => {
-  const out = [];
-  for (let d = S.SEMESTER_START; S.diffDays(d, S.SEMESTER_END) >= 0; d = S.addDays(d, 1)) if (S.dayOfWeek(d) <= 5 && S.weekNumber(d)) out.push(d);
-  return out;
-})();
-const WEEKS = S.TEACHING_BLOCKS.flatMap((b) => Array.from({ length: b.weeks }, (_, i) => ({ n: b.first + i, mon: S.addDays(b.start, i * 7) })));
+let SEM_DAYS = [], WEEKS = [];
+function recomputeCalendar() {
+  SEM_DAYS = [];
+  for (let d = S.SEMESTER_START; S.diffDays(d, S.SEMESTER_END) >= 0; d = S.addDays(d, 1)) if (S.dayOfWeek(d) <= 5 && S.weekNumber(d)) SEM_DAYS.push(d);
+  WEEKS = S.TEACHING_BLOCKS.flatMap((b) => Array.from({ length: b.weeks }, (_, i) => ({ n: b.first + i, mon: S.addDays(b.start, i * 7) })));
+}
+// orarul salvat pe telefon (dacă a fost actualizat din Cloudflare)
+try { const saved = store.get('orar', null); if (saved) S.setSchedule(saved); } catch { store.del('orar'); }
+recomputeCalendar();
 function defaultDate() {
   const t = todayYMD();
   if (S.dayOfWeek(t) <= 5 && S.weekNumber(t)) return t;
@@ -166,7 +173,7 @@ function list(ymd, evs, live) {
     const s = S.toMin(e.start), en = S.toMin(e.end);
     const st = live ? (en <= m ? 'past' : s <= m ? 'now' : '') : '';
     const per = e.per === 'p' ? ', <span class="alt">doar în săptămânile pare</span>' : e.per === 'i' ? ', <span class="alt">doar în săptămânile impare</span>' : '';
-    out += `<li class="item ${st}" data-c="${e.code}">
+    out += `<li class="item ${st}" ${dc(e.code)}>
       <div class="t">${short(e.start)}<span>${short(e.end)}</span></div>
       <div><div class="n">${h(e.name)}</div><div class="desc">${TYPE[e.type]}, ${h(e.prof)}${per}</div></div>
       <div class="r"><span class="mark">${h(e.room)}</span></div>
@@ -183,18 +190,18 @@ function markerHero(t) {
   const nxt = evs.find((e) => S.toMin(e.start) > m);
   if (cur) {
     const s = S.toMin(cur.start), en = S.toMin(cur.end);
-    return `<section class="hero" data-c="${cur.code}">
+    return `<section class="hero" ${dc(cur.code)}>
       <p class="when">Acum, până la <b>${short(cur.end)}</b></p>
       <h1>${h(cur.name)}</h1>
       <p class="where">${TYPE[cur.type]} în <span class="mark">${h(cur.room)}</span></p>
       <p class="who">cu ${h(cur.prof)}</p>
       <div class="left"><div class="track"><i style="width:${Math.round(((m - s) / (en - s)) * 100)}%"></i></div>mai ai ${span(en - m)}</div>
-      ${nxt ? `<p class="then" data-c="${nxt.code}">Apoi la ${short(nxt.start)}: <b>${h(nxt.name)}</b> în <span class="mark">${h(nxt.room)}</span></p>` : '<p class="then">E ultima oră de azi.</p>'}
+      ${nxt ? `<p class="then" ${dc(nxt.code)}>Apoi la ${short(nxt.start)}: <b>${h(nxt.name)}</b> în <span class="mark">${h(nxt.room)}</span></p>` : '<p class="then">E ultima oră de azi.</p>'}
     </section>`;
   }
   if (nxt) {
     const inMin = S.toMin(nxt.start) - m;
-    return `<section class="hero" data-c="${nxt.code}">
+    return `<section class="hero" ${dc(nxt.code)}>
       <p class="when">${inMin <= 180 ? `Peste ${span(inMin)}, la <b>${short(nxt.start)}</b>` : `Azi la <b>${short(nxt.start)}</b>`}</p>
       <h1>${h(nxt.name)}</h1>
       <p class="where">${TYPE[nxt.type]} în <span class="mark">${h(nxt.room)}</span></p>
@@ -209,7 +216,7 @@ function markerHero(t) {
     before: 'Semestrul începe luni.', after: 'Orele s-au terminat. Urmează sesiunea.',
   }[st.kind] || 'Azi n-ai ore.';
   return `<section class="hero quiet"><h1>${h(title)}</h1>
-    ${first ? `<p class="then" data-c="${first.code}">Următoarea e ${dayWord(nd)} la ${short(first.start)}: <b>${h(first.name)}</b> în <span class="mark">${h(first.room)}</span></p>` : ''}
+    ${first ? `<p class="then" ${dc(first.code)}>Următoarea e ${dayWord(nd)} la ${short(first.start)}: <b>${h(first.name)}</b> în <span class="mark">${h(first.room)}</span></p>` : ''}
   </section>`;
 }
 
@@ -384,14 +391,14 @@ function renderWeek() {
     const d = S.addDays(w.mon, i);
     const evs = S.eventsForDate(d);
     html += `<button class="day ${d === t ? 'today' : ''}" data-d="${d}" aria-pressed="${d === sel}" aria-label="${DAY[i + 1]} ${dm(d)}">
-      <span>${SHORT[i]}</span><b>${bilet ? d.slice(8) : Number(d.slice(8))}</b><span class="ink">${evs.map((e) => `<i data-c="${e.code}"></i>`).join('')}</span></button>`;
+      <span>${SHORT[i]}</span><b>${bilet ? d.slice(8) : Number(d.slice(8))}</b><span class="ink">${evs.map((e) => `<i ${dc(e.code)}></i>`).join('')}</span></button>`;
   }
   html += '</div>';
   const evs = S.eventsForDate(sel);
   html += `<h2 class="list-title">${DAY[S.dayOfWeek(sel)]}, ${dm(sel)}${sel === t ? '<small>azi</small>' : ''}</h2>`;
   if (evs.length) html += list(sel, evs, sel === t);
   else html += `<p class="empty">${S.HOLIDAYS[sel] ? `Liber, e ${h(S.HOLIDAYS[sel])}.` : 'Nicio oră în ziua asta.'}</p>`;
-  html += `<ul class="subjects">${Object.entries(S.SUBJECTS).map(([c, s]) => `<li data-c="${c}"><b><span class="mark">${c}</span></b>${h(s.name)}</li>`).join('')}</ul>`;
+  html += `<ul class="subjects">${Object.entries(S.SUBJECTS).map(([c, s]) => `<li ${dc(c)}><b><span class="mark">${c}</span></b>${h(s.name)}</li>`).join('')}</ul>`;
   $('view').innerHTML = html;
 }
 
@@ -399,92 +406,123 @@ function renderWeek() {
 // Setări: temă + notificări (în panoul de jos la v2, pagină la celelalte)
 // =====================================================================
 let swReg = null;
+// Robotul grupei (Cloudflare). Toți colegii se înregistrează automat aici.
+const PUSH_SERVER = 'https://orar-1104a.alex-bordianu1337.workers.dev';
 const b64u = {
   enc: (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
   dec: (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), (c) => c.charCodeAt(0)),
 };
-async function ensureKeys() {
-  let k = store.get('vapid', null);
-  if (k) return k;
-  const kp = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign']);
-  const pub = await crypto.subtle.exportKey('raw', kp.publicKey);
-  const jwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
-  k = { publicKey: b64u.enc(pub), privateKey: jwk.d };
-  store.set('vapid', k);
-  return k;
-}
 async function getSub() {
   if (!swReg?.pushManager) return null;
   try { return await swReg.pushManager.getSubscription(); } catch { return null; }
 }
-// Codul care se pune ca secret NOTIFY_CONFIG (în Cloudflare sau GitHub)
-function configCode(sub) {
-  const k = store.get('vapid', null);
-  if (!sub || !k) return '';
-  const j = sub.toJSON();
-  const data = { v: 1, sub: { endpoint: j.endpoint, keys: j.keys }, vapid: { ...k, subject: location.origin.startsWith('https') ? location.origin : 'mailto:orar@example.com' }, prefs: prefs() };
-  return b64u.enc(new TextEncoder().encode(JSON.stringify(data)));
+async function api(path, body) {
+  const res = await fetch(PUSH_SERVER + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.ok === false) throw new Error(data.eroare || `Serverul a răspuns ${res.status}`);
+  return data;
+}
+// Trimite abonamentul + setările la robot. Dacă nu e internet, reîncearcă la următoarea deschidere.
+async function syncPrefs({ quiet = false } = {}) {
+  const sub = await getSub();
+  if (!sub) { store.del('pending'); return; }
+  try {
+    await api('/subscribe', { subscription: sub.toJSON(), prefs: prefs() });
+    store.del('pending');
+    if (!quiet) toast('Salvat');
+  } catch (e) {
+    store.set('pending', true);
+    if (!quiet) toast('Fără internet. Salvez când revine conexiunea.');
+  }
+  updateBell();
 }
 async function enable() {
   try {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') { toast('Nu ai permis notificările'); return refreshSettings(); }
-    const k = await ensureKeys();
+    const { publicKey } = await api('/vapid');
     let sub = await swReg.pushManager.getSubscription();
     if (sub) {
       const cur = sub.options?.applicationServerKey;
-      if (cur && b64u.enc(cur) !== k.publicKey) { await sub.unsubscribe(); sub = null; }
+      if (!cur || b64u.enc(cur) !== publicKey) { await sub.unsubscribe(); sub = null; }
     }
-    if (!sub) sub = await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u.dec(k.publicKey) });
-    store.del('copied');
-    toast('Notificări pornite. Mai copiază codul.');
+    if (!sub) sub = await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u.dec(publicKey) });
+    await api('/subscribe', { subscription: sub.toJSON(), prefs: prefs() });
+    store.del('pending');
+    toast('Notificări pornite ✓');
   } catch (e) {
     console.error(e);
-    toast(e.message || 'Notificările nu s-au putut porni');
+    toast(navigator.onLine === false ? 'Ai nevoie de internet ca să pornești notificările' : (e.message || 'Notificările nu s-au putut porni'));
   }
   refreshSettings();
 }
 async function disable() {
   const sub = await getSub();
-  if (sub) await sub.unsubscribe().catch(() => {});
-  store.del('copied');
+  if (sub) {
+    try { await api('/unsubscribe', { endpoint: sub.endpoint }); } catch {}
+    await sub.unsubscribe().catch(() => {});
+  }
+  store.del('pending');
   toast('Notificări oprite');
   refreshSettings();
 }
-async function copyCode() {
-  const code = configCode(await getSub());
-  if (!code) return;
-  try { await navigator.clipboard.writeText(code); }
-  catch {
-    const ta = document.createElement('textarea');
-    ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+async function testPush() {
+  const sub = await getSub();
+  if (!sub) return;
+  try { await api('/test', { endpoint: sub.endpoint }); toast('Trimis. Apare în câteva secunde.'); }
+  catch (e) {
+    toast(e.message);
+    try { await swReg.showNotification('PC1 laborator în 15 min · sala A1-13', { body: 'Programarea calculatoarelor I, 14:00–17:00', icon: 'icon-192.png', tag: 'test' }); } catch {}
   }
-  store.set('copied', code);
-  toast('Cod copiat');
-  refreshSettings();
 }
-async function testLocal() {
-  try { await swReg.showNotification('PC1 laborator în 15 min · sala A1-13', { body: 'Programarea calculatoarelor I, 14:00–17:00', icon: 'icon-192.png', tag: 'test' }); }
-  catch (e) { toast(e.message); }
+const testLocal = testPush;
+// ---------- actualizarea orarului din Cloudflare ----------
+async function updateSchedule({ quiet = false } = {}) {
+  try {
+    const d = await api('/orar');
+    const err = S.validateSchedule(d);
+    if (err) throw new Error('Orarul primit e invalid (' + err + ')');
+    store.set('orarCheck', Date.now());
+    const curStamp = (S.VERSION || '') + '|' + (store.get('orar', null)?.savedAt || '');
+    const newStamp = (d.version || '') + '|' + (d.savedAt || '');
+    if (curStamp === newStamp || (!d.savedAt && !store.get('orar', null) && d.version === S.DEFAULT_SCHEDULE.version)) {
+      if (!quiet) toast(`Ai deja ultimul orar (${S.VERSION || 'inclus'})`);
+      return false;
+    }
+    const clean = { version: d.version, source: d.source, subjects: d.subjects, events: d.events, blocks: d.blocks, holidays: d.holidays, savedAt: d.savedAt };
+    S.setSchedule(clean);
+    if (d.savedAt) store.set('orar', clean); else store.del('orar');
+    recomputeCalendar();
+    sel = null; wi = weekIndexFor(todayYMD());
+    const inSheet = !$('sheet').hidden;
+    mount();
+    if (inSheet) renderSettings($('sheetBody'));
+    toast(`Orar actualizat: ${S.VERSION}`);
+    return true;
+  } catch (e) {
+    if (!quiet) toast(navigator.onLine === false ? 'Ai nevoie de internet ca să actualizezi orarul' : e.message);
+    return false;
+  }
 }
+
 async function updateBell() {
   const dot = $('bellDot');
-  if (!dot) return;
-  const sub = await getSub();
-  dot.hidden = !(sub && store.get('copied', null) !== configCode(sub));
+  if (dot) dot.hidden = !((await getSub()) && store.get('pending', false));
 }
 
 async function renderSettings(target) {
   const p = prefs();
   const sub = await getSub();
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
-  const code = configCode(sub);
-  const copied = store.get('copied', null);
+  const pending = store.get('pending', false);
 
   let html = '<h1 class="title">Setări</h1>';
   html += `<h2 class="h2">Temă</h2><div class="themes">${Object.entries(THEMES).map(([id, t]) =>
     `<button class="theme" data-theme="${id}" aria-pressed="${id === theme}"><span class="sw sw-${id}"></span><b>${h(t.name)}</b><span>${h(t.desc)}</span></button>`).join('')}</div>`;
 
+  const chk = store.get('orarCheck', 0);
+  html += `<h2 class="h2">Orar</h2><div class="group"><div class="opt"><div><b>Versiunea ${h(S.VERSION || 'inclusă')}</b><span>${chk ? `verificat ${new Date(chk).toLocaleString('ro-RO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : 'încă neverificat'}</span></div></div></div>
+  <button class="btn plain" data-a="update-orar">Actualizează orarul</button>`;
   html += '<h2 class="h2">Notificări</h2><p class="lede">Un mesaj înainte de fiecare oră, cu sala. Merge și cu aplicația închisă.</p>';
   if (isIOS && !isStandalone()) {
     html += `<div class="status warn"><i></i><div>Adaugă aplicația pe ecranul principal<span>Pe iPhone, notificările merg doar așa (iOS 16.4 sau mai nou).</span></div></div>
@@ -496,16 +534,7 @@ async function renderSettings(target) {
   } else if (!sub) {
     html += '<div class="status"><i></i><div>Oprite</div></div><button class="btn" data-a="enable">Pornește notificările</button>';
   } else {
-    const done = copied === code;
-    html += `<div class="status ${done ? 'on' : 'warn'}"><i></i><div>${done ? 'Pornite' : copied ? 'Ai schimbat setările' : 'Aproape gata'}<span>${done ? `Primești mesajul cu ${p.minutes} minute înainte.` : copied ? 'Copiază codul din nou și înlocuiește secretul NOTIFY_CONFIG.' : 'Mai trebuie pus codul în Cloudflare, o singură dată.'}</span></div></div>
-    <ol class="steps">
-      <li>Copiază codul de mai jos.</li>
-      <li>În Cloudflare, la robotul tău: Settings, Variables and Secrets, Add, tip Secret.</li>
-      <li>Nume <code>NOTIFY_CONFIG</code>, lipește codul, Deploy.</li>
-      <li>Test: deschide adresa robotului cu <code>/test</code> la final.</li>
-    </ol>
-    <div class="codebox">${h(code)}</div>
-    <button class="btn ${done ? 'plain' : ''}" data-a="copy">Copiază codul</button>`;
+    html += `<div class="status ${pending ? 'warn' : 'on'}"><i></i><div>${pending ? 'Pornite, dar nesincronizate' : 'Pornite'}<span>${pending ? 'Ultima schimbare se trimite când ai internet.' : `Primești mesajul cu ${p.minutes} minute înainte.`}</span></div></div>`;
   }
 
   html += `<h2 class="h2">Când</h2><div class="group">
@@ -514,9 +543,9 @@ async function renderSettings(target) {
     <div class="opt"><div><b>Programul zilei</b><span>dimineața la 7:00</span></div><button class="tog" role="switch" data-t="morning" aria-checked="${p.morning}" aria-label="Programul zilei"></button></div>
     <div class="opt"><div><b>Ce ai mâine</b><span>seara la 20:00</span></div><button class="tog" role="switch" data-t="evening" aria-checked="${p.evening}" aria-label="Ce ai mâine"></button></div>
   </div>
-  <p class="small">Săptămânile pare și impare, vacanța de Crăciun și zilele libere sunt deja luate în calcul. Notificările vin cu sunetul standard al iPhone-ului; dacă nu sună, verifică Setări iPhone › Notificări › Orar › Sunete.</p>`;
-  if (sub) html += '<button class="btn plain" data-a="test">Arată o notificare de probă</button><button class="btn danger" data-a="disable">Oprește notificările</button>';
-  html += '<p class="foot">Orar 1104A, AIA anul I, semestrul I 2026–2027. Datele vin din Orar_AC_2026-2027_sem_I_v04.xlsx.</p>';
+  <p class="small">${persisted ? 'Aplicația e salvată permanent pe telefon și merge și fără internet.' : 'Aplicația merge și fără internet după prima deschidere.'} Săptămânile pare și impare, vacanța de Crăciun și zilele libere sunt deja luate în calcul. Notificările vin cu sunetul standard al iPhone-ului; dacă nu sună, verifică Setări iPhone › Notificări › Orar › Sunete.</p>`;
+  if (sub) html += '<button class="btn plain" data-a="test">Trimite o notificare de probă</button><button class="btn danger" data-a="disable">Oprește notificările</button>';
+  html += `<p class="foot">Orar 1104A, AIA anul I, semestrul I 2026–2027. Datele vin din ${h(S.SOURCE || 'orarul facultății')}.</p>`;
   target.innerHTML = html;
   updateBell();
 }
@@ -580,12 +609,12 @@ document.addEventListener('click', (e) => {
   if (a === 'settings') return openSheet();
   if (a === 'prev' && wi > 0) { wi--; sel = null; renderWeek(); }
   else if (a === 'next' && wi < WEEKS.length - 1) { wi++; sel = null; renderWeek(); }
+  else if (a === 'update-orar') { b.disabled = true; updateSchedule().finally(() => { b.disabled = false; }); }
   else if (a === 'enable') { b.disabled = true; enable(); }
-  else if (a === 'copy') copyCode();
   else if (a === 'test') testLocal();
   else if (a === 'disable') disable();
-  else if (b.dataset.min) { store.set('minutes', Number(b.dataset.min)); refreshSettings(); }
-  else if (b.dataset.t) { store.set(b.dataset.t, !prefs()[b.dataset.t]); refreshSettings(); }
+  else if (b.dataset.min) { store.set('minutes', Number(b.dataset.min)); refreshSettings(); syncPrefs(); }
+  else if (b.dataset.t) { store.set(b.dataset.t, !prefs()[b.dataset.t]); refreshSettings(); syncPrefs(); }
 });
 $('scrim').addEventListener('click', closeSheet);
 let sy = null;
@@ -621,11 +650,33 @@ if (T().layout === 'strip') sel = defaultDate();
 mount();
 if (params.has('sheet') && T().layout === 'strip') openSheet();
 setInterval(() => { if (!document.hidden && $('sheet').hidden) render(); }, 30000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && $('sheet').hidden) render(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { if ($('sheet').hidden) render(); if (swReg && store.get('pending', false)) syncPrefs({ quiet: true }); } });
+window.addEventListener('online', () => { if (swReg && store.get('pending', false)) syncPrefs({ quiet: true }); });
+
+// cere telefonului să nu șteargă niciodată datele aplicației (iOS 17+, acordat de obicei aplicațiilor de pe ecranul principal)
+let persisted = null;
+async function askPersist() {
+  try {
+    if (!navigator.storage?.persist) return;
+    persisted = await navigator.storage.persisted();
+    if (!persisted && isStandalone()) persisted = await navigator.storage.persist();
+  } catch {}
+}
+askPersist();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(async () => {
     swReg = await navigator.serviceWorker.ready;
+    // abonamentele făcute cu varianta veche (cod copiat manual) nu merg cu robotul grupei: le oprim o dată
+    if (store.get('vapid', null)) {
+      const old = await getSub();
+      if (old) await old.unsubscribe().catch(() => {});
+      store.del('vapid'); store.del('copied');
+      toast('Notificările s-au mutat pe robotul grupei. Pornește-le din nou din Setări.');
+      refreshSettings();
+    }
+    if (store.get('pending', false)) syncPrefs({ quiet: true });
+    if (navigator.onLine !== false && Date.now() - store.get('orarCheck', 0) > 3 * 3600e3) updateSchedule({ quiet: true });
     updateBell();
     refreshSettings();
   }).catch((e) => console.warn('SW', e));

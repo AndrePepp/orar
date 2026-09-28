@@ -1,7 +1,7 @@
 // Service worker: funcționare offline + afișarea notificărilor push.
-const VERSION = 'orar-1104a-v5c';
+const VERSION = 'orar-1104a-v7';
 const ASSETS = ['./', 'index.html', 'app.css', 'app.js', 'schedule.js', 'manifest.webmanifest',
-  'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
+  'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -13,17 +13,23 @@ self.addEventListener('activate', (e) => {
     .then(() => self.clients.claim()));
 });
 
-// Stale-while-revalidate pentru fișierele aplicației; cererile către alt domeniu (serverul push) trec direct.
+// Offline întâi: totul se servește din memoria telefonului, iar internetul doar actualizează în fundal.
+// Dacă site-ul dispare (repo șters, fără net), aplicația rămâne cu ultima versiune bună.
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  const isPage = e.request.mode === 'navigate';
   e.respondWith(caches.open(VERSION).then(async (cache) => {
-    const cached = await cache.match(e.request, { ignoreSearch: true });
+    const cached = isPage
+      ? (await cache.match('index.html')) || (await cache.match('./'))
+      : await cache.match(e.request, { ignoreSearch: true });
     const network = fetch(e.request).then((res) => {
-      if (res.ok) cache.put(e.request, res.clone());
+      // se salvează doar răspunsurile bune; un 404 nu strică niciodată ce e deja în memorie
+      if (res.ok && res.type === 'basic') cache.put(isPage ? 'index.html' : e.request, res.clone());
       return res;
-    }).catch(() => cached);
-    return cached || network;
+    }).catch(() => null);
+    if (cached) { e.waitUntil(network); return cached; }
+    return (await network) || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   }));
 });
 
